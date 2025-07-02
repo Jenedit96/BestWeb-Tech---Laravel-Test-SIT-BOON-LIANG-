@@ -1,0 +1,75 @@
+// tests/Feature/ProductApiTest.php
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\User;
+
+class ProductApiTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function authenticate()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'sanctum');
+    }
+
+    public function test_can_create_product()
+    {
+        $this->authenticate();
+
+        $category = Category::factory()->create();
+
+        $response = $this->postJson('/api/products', [
+            'name' => 'Test Product',
+            'category_id' => $category->id,
+            'description' => 'Test description',
+            'price' => 99.99,
+            'stock' => 10,
+            'enabled' => true
+        ]);
+
+        $response->assertCreated()
+                 ->assertJsonFragment(['name' => 'Test Product']);
+    }
+
+    public function test_can_list_products()
+    {
+        $this->authenticate();
+
+        $response = $this->getJson('/api/products');
+
+        $response->assertOk();
+    }
+
+    public function test_can_update_product()
+    {
+        $this->authenticate();
+
+        $category = Category::factory()->create();
+        $product = Product::factory()->create();
+
+        $response = $this->putJson('/api/products/'.$product->id, [
+            'name' => 'Updated Name'
+        ]);
+
+        $response->assertOk()
+                 ->assertJsonFragment(['name' => 'Updated Name']);
+    }
+
+    public function test_can_delete_product()
+    {
+        $this->authenticate();
+
+        $product = Product::factory()->create();
+
+        $response = $this->deleteJson('/api/products/'.$product->id);
+
+        $response->assertNoContent();
+    }
+}
+
+// Note: Create factories for Product, Category, User if not exist
