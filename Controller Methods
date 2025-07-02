@@ -1,0 +1,41 @@
+public function index(Request $request)
+{
+    $query = Product::with('category');
+
+    if ($request->has('category_id')) {
+        $query->where('category_id', $request->category_id);
+    }
+
+    return ProductResource::collection($query->paginate(10));
+}
+
+public function store(StoreProductRequest $request)
+{
+    $product = Product::create($request->validated());
+    return new ProductResource($product);
+}
+
+public function show(Product $product)
+{
+    return new ProductResource($product->load('category'));
+}
+
+public function update(UpdateProductRequest $request, Product $product)
+{
+    $product->update($request->validated());
+    return new ProductResource($product);
+}
+
+public function destroy(Product $product)
+{
+    $product->delete();
+    return response()->noContent();
+}
+
+public function bulkDelete(Request $request)
+{
+    $ids = $request->input('ids', []);
+    Product::whereIn('id', $ids)->delete();
+    return response()->json(['message' => 'Products deleted.']);
+}
+
