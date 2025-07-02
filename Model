@@ -1,4 +1,8 @@
 // app/Models/Category.php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
 class Category extends Model
 {
     protected $fillable = ['name'];
@@ -10,6 +14,11 @@ class Category extends Model
 }
 
 // app/Models/Product.php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Product extends Model
 {
     use SoftDeletes;
@@ -20,7 +29,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'enabled',
+        'enabled'
     ];
 
     public function category()
