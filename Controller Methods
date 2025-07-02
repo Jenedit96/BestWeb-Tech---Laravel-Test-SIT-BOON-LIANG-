@@ -1,41 +1,66 @@
-public function index(Request $request)
-{
-    $query = Product::with('category');
+// app/Http/Controllers/Api/ProductController.php
+namespace App\Http\Controllers\Api;
 
-    if ($request->has('category_id')) {
-        $query->where('category_id', $request->category_id);
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductResource;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductsExport;
+
+class ProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Product::with('category');
+
+        if ($request->has('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('enabled')) {
+            $query->where('enabled', $request->enabled);
+        }
+
+        return ProductResource::collection($query->paginate(10));
     }
 
-    return ProductResource::collection($query->paginate(10));
+    public function store(StoreProductRequest $request)
+    {
+        $product = Product::create($request->validated());
+        return new ProductResource($product->load('category'));
+    }
+
+    public function show(Product $product)
+    {
+        return new ProductResource($product->load('category'));
+    }
+
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $product->update($request->validated());
+        return new ProductResource($product->load('category'));
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+        return response()->noContent();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        Product::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Products deleted successfully.']);
+    }
+
+    public function export()
+    {
+        return Excel::download(new ProductsExport, 'products.xlsx');
+    }
 }
 
-public function store(StoreProductRequest $request)
-{
-    $product = Product::create($request->validated());
-    return new ProductResource($product);
-}
-
-public function show(Product $product)
-{
-    return new ProductResource($product->load('category'));
-}
-
-public function update(UpdateProductRequest $request, Product $product)
-{
-    $product->update($request->validated());
-    return new ProductResource($product);
-}
-
-public function destroy(Product $product)
-{
-    $product->delete();
-    return response()->noContent();
-}
-
-public function bulkDelete(Request $request)
-{
-    $ids = $request->input('ids', []);
-    Product::whereIn('id', $ids)->delete();
-    return response()->json(['message' => 'Products deleted.']);
-}
 
