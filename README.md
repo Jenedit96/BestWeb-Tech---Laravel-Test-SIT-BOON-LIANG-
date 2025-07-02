@@ -2,54 +2,48 @@
 
 # Laravel Product CRUD API
 
-## Setup
+## Requirements
+- PHP >= 8.1
+- Composer
+- MySQL
 
+## Setup
 ```bash
-git clone <repository_url>
+git clone <repo>
 cd <project>
 composer install
 cp .env.example .env
 php artisan key:generate
 ```
 
-Configure `.env` with MySQL credentials.
-
-Run migrations:
+Configure `.env` for DB connection.
 
 ```bash
 php artisan migrate
 ```
 
-(Optional) Seed data:
-
-```bash
-php artisan db:seed
-```
+(Optional) Create a personal access token if using Sanctum.
 
 ## API Endpoints
+| Method | Endpoint                     | Description                |
+|--------|------------------------------|----------------------------|
+| GET    | /api/products                | List products              |
+| POST   | /api/products                | Create product             |
+| GET    | /api/products/{id}           | Show product               |
+| PUT    | /api/products/{id}           | Update product             |
+| DELETE | /api/products/{id}           | Soft delete product        |
+| POST   | /api/products/bulk-delete    | Bulk delete                |
+| GET    | /api/products-export         | Export to Excel            |
 
-| Method | Endpoint                | Description                      |
-|--------|-------------------------|----------------------------------|
-| GET    | /api/products           | List products                    |
-| POST   | /api/products           | Create product                   |
-| GET    | /api/products/{id}      | Show product details             |
-| PUT    | /api/products/{id}      | Update product                   |
-| DELETE | /api/products/{id}      | Soft delete product              |
-| POST   | /api/products/bulk-delete | Bulk delete products           |
-
-## Running Tests
-
+## Testing
 ```bash
 php artisan test
 ```
 
-## Docker (Optional)
+## Docker
+If implemented, see `docker-compose.yml`.
 
-See `docker-compose.yml` for Docker setup instructions.
-
-## Assumptions and Design Choices
-
-- Used Laravel Sanctum for authentication.
-- Soft deletes implemented via Eloquent.
-- Validation via Form Requests.
-- Pagination defaults to 10 items per page.
+## Notes
+- Authentication: Laravel Sanctum
+- Exports: Laravel Excel
+- Validation: Form Requests
