@@ -1,0 +1,30 @@
+// app/Models/Category.php
+class Category extends Model
+{
+    protected $fillable = ['name'];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+}
+
+// app/Models/Product.php
+class Product extends Model
+{
+    use SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'category_id',
+        'description',
+        'price',
+        'stock',
+        'enabled',
+    ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+}
